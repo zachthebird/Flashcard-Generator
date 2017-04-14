@@ -4,9 +4,11 @@ var closedDeleted = [];
 
 var basic = [];
 
-function practiceBasic(){
-	for(var i = 0; i<basic.length; i++){
-		basic[i].practice();
+function practiceBasic(count){
+	if(count<basic.length){
+		basic[count].practice();
+	}else{
+	mainMenu();
 	}
 };
 
@@ -25,6 +27,7 @@ var correctAnswer;
 
 BasicCard.prototype.practice = function (){
 	correctAnswer = this.back;
+	var me = this;
 	inquirer.prompt({
 		type: 'input',
 		message: this.front,
@@ -33,8 +36,10 @@ BasicCard.prototype.practice = function (){
 		if(answer.reply === correctAnswer){
 			console.log('correct!');
 		} else {
-			console.log('incorrect, the answer is '+this.back);
+			console.log('incorrect, the answer is '+ me.back);
 		}
+		count++
+		practiceBasic(count);
 	})
 }
 
@@ -80,7 +85,7 @@ var doneCreating = {
 	choices: ['Make another flash card', 'Return to the main menu']
 };
 
-function createWhich(){
+var createWhich = function (){
 	inquirer.prompt(createType).then(function(response){
 		switch (response.createType){
 			case 'Standard FlashCard':
@@ -104,10 +109,10 @@ var standardBack = {
 	message: '\nWhat is the answer to this flashcard? i.e.: Please write out what you would like to be on the back of the card?\n',
 	name: 'standardBackInput'
 };
-var getStandardBack = function () {
+var getStandardBack = function (standardFrontAnswer) {
 	inquirer.prompt(standardBack).then(function(response){
-		standardBack = response.standardBackInput;
-		new BasicCard (standardFront, standardBack);
+		standardBackAnswer = response.standardBackInput;
+		new BasicCard (standardFrontAnswer, standardBackAnswer);
 		NotherCardOrMainMenu();
 	}).catch(function(err){
 		console.log(err);
@@ -119,11 +124,10 @@ var standardBack;
 var clozeFront;
 var clozeBack;
 
-function createStandard(){
+var createStandard = function (){
 	console.log('got here');
 	inquirer.prompt(standardFront).then(function(result){
-		standardFront = result.standardFrontInput;
-		getStandardBack();
+		getStandardBack(result.standardFrontInput);
 	})
 };
 
@@ -185,11 +189,11 @@ var mainMenu = function() {
 };
 
 mainMenu();
-
+var count = 0;
 function whatType () {
 	inquirer.prompt(questionWhatType).then(function(reply){
 		if(reply.questionWhatType === 'Standard Flash Cards'){
-			practiceBasic();
+			practiceBasic(count);
 		} else if(reply.questionWhatType === 'Cloze Cards'){
 			practiceCloze();
 		}
